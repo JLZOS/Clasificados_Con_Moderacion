@@ -7,6 +7,7 @@ const valid = {
   price: 80000,
   category: "libros",
   condition: "usado",
+  contact: "WhatsApp 300 000 0000",
 };
 
 describe("validateListingInput", () => {
@@ -40,6 +41,13 @@ describe("validateListingInput", () => {
     if (result.ok) return;
     expect(result.errors.category).toBeDefined();
     expect(result.errors.condition).toBeDefined();
+  });
+
+  it("exige un medio de contacto", () => {
+    const result = validateListingInput({ ...valid, contact: " 12 " });
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.errors.contact).toMatch(/contactarlo/);
   });
 
   it("reporta el error de formulario cuando la entrada no es un objeto", () => {

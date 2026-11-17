@@ -47,6 +47,8 @@ export const LISTING_LIMITS = {
   descriptionMin: 20,
   descriptionMax: 2000,
   priceMax: 50_000_000,
+  contactMin: 5,
+  contactMax: 100,
   photosMin: 1,
   photosMax: 5,
   photoMaxBytes: 5 * 1024 * 1024,
@@ -74,6 +76,11 @@ export const listingInputSchema = z.object({
     .max(L.priceMax, "El precio supera el máximo permitido"),
   category: z.enum(CATEGORIES, { error: "Seleccione una categoría válida" }),
   condition: z.enum(CONDITIONS, { error: "Seleccione el estado del artículo" }),
+  contact: z
+    .string()
+    .trim()
+    .min(L.contactMin, "Indique cómo contactarlo (WhatsApp, correo…)")
+    .max(L.contactMax, `El contacto admite máximo ${L.contactMax} caracteres`),
 });
 export type ListingInput = z.infer<typeof listingInputSchema>;
 

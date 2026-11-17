@@ -8,6 +8,7 @@ export function makeListing(overrides: Partial<Listing> = {}): Listing {
     price: 45000,
     category: "tecnologia",
     condition: "usado",
+    contact: "ana@universidad.edu.co",
     sellerId: "seller",
     sellerName: "Ana",
     photoUrls: ["/seed/tecnologia.svg"],

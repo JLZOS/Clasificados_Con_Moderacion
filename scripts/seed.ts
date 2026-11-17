@@ -118,28 +118,32 @@ const LISTINGS: SeedListing[] = [
 
 async function seedUsers(): Promise<void> {
   const auth = getAuth();
-  for (const user of USERS) {
+  for (const { moderator, ...user } of USERS) {
     await auth.deleteUser(user.uid).catch(() => undefined);
     await auth.createUser({ ...user, password: PASSWORD, emailVerified: true });
-    if (user.moderator) await auth.setCustomUserClaims(user.uid, { role: "moderator" });
+    if (moderator) await auth.setCustomUserClaims(user.uid, { role: "moderator" });
   }
 }
 
-function sellerName(uid: string): string {
-  return USERS.find((u) => u.uid === uid)?.displayName ?? uid;
+function seller(uid: string): SeedUser {
+  const user = USERS.find((u) => u.uid === uid);
+  if (!user) throw new Error(`Usuario de ejemplo desconocido: ${uid}`);
+  return user;
 }
 
 async function seedListings(): Promise<void> {
   const db = getFirestore();
   const now = Date.now();
   for (const [i, item] of LISTINGS.entries()) {
-    const { seller, reportCount = 0, ...data } = item;
+    const { seller: sellerId, reportCount = 0, ...data } = item;
+    const owner = seller(sellerId);
     const createdAt = Timestamp.fromMillis(now - i * 5 * 3_600_000);
     await db.doc(`listings/seed-${i + 1}`).set({
       ...data,
+      contact: owner.email,
       photoUrls: [`/seed/${data.category}.svg`],
-      sellerId: seller,
-      sellerName: sellerName(seller),
+      sellerId,
+      sellerName: owner.displayName,
       reportCount,
       moderationNote: null,
       createdAt,

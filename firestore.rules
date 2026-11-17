@@ -26,7 +26,7 @@ service cloud.firestore {
 
     function validNewListing(d) {
       return d.keys().hasOnly(['title', 'description', 'price', 'category', 'condition',
-          'photoUrls', 'sellerId', 'sellerName', 'status', 'reportCount', 'moderationNote',
+          'contact', 'photoUrls', 'sellerId', 'sellerName', 'status', 'reportCount', 'moderationNote',
           'createdAt', 'updatedAt'])
         && d.sellerId == request.auth.uid
         && d.status == 'pending' && d.reportCount == 0 && d.moderationNote == null
@@ -35,6 +35,7 @@ service cloud.firestore {
         && d.price is int && d.price >= 0 && d.price <= 50000000
         && d.category in ['libros', 'tecnologia', 'ropa', 'muebles', 'deportes', 'servicios', 'otros']
         && d.condition in ['nuevo', 'como_nuevo', 'usado']
+        && d.contact is string && d.contact.size() >= 5 && d.contact.size() <= 100
         && d.photoUrls is list && d.photoUrls.size() >= 1 && d.photoUrls.size() <= 5
         && d.sellerName is string && d.sellerName.size() <= 80
         && d.createdAt == request.time && d.updatedAt == request.time;
