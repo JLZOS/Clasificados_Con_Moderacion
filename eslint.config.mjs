@@ -22,6 +22,7 @@ export default defineConfig([
       "no-console": "error",
       eqeqeq: ["error", "always"],
       "no-warning-comments": ["error", { terms: ["fixme", "xxx"] }],
+      "@next/next/no-html-link-for-pages": "off",
     },
   },
   {

@@ -69,15 +69,3 @@ export async function register({ email, password, displayName }: Registration): 
 export async function signOut(): Promise<void> {
   await firebaseSignOut(firebase().auth);
 }
-
-const AUTH_MESSAGES: Record<string, string> = {
-  "auth/invalid-credential": "Correo o contraseña incorrectos",
-  "auth/email-already-in-use": "Ya existe una cuenta con ese correo",
-  "auth/too-many-requests": "Demasiados intentos. Espere un momento",
-  "auth/network-request-failed": "Sin conexión con el servidor (¿están corriendo los emuladores?)",
-};
-
-export function authErrorMessage(error: unknown): string {
-  const code = error instanceof Error && "code" in error ? String(error.code) : "";
-  return AUTH_MESSAGES[code] ?? "No fue posible completar la operación";
-}

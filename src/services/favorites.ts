@@ -1,4 +1,12 @@
-import { collection, deleteDoc, doc, getDocs, serverTimestamp, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 import type { Listing } from "@/domain/listing";
 import { firebase } from "@/lib/firebase";
 import { compact } from "./converters";
@@ -11,6 +19,10 @@ function favoritesRef(uid: string) {
 export async function listFavoriteIds(uid: string): Promise<Set<string>> {
   const snap = await getDocs(favoritesRef(uid));
   return new Set(snap.docs.map((d) => d.id));
+}
+
+export async function isFavorite(uid: string, listingId: string): Promise<boolean> {
+  return (await getDoc(doc(favoritesRef(uid), listingId))).exists();
 }
 
 export async function addFavorite(uid: string, listingId: string): Promise<void> {
