@@ -41,9 +41,11 @@ export default function HomePage() {
       <Hero />
       <div className="space-y-6">
         <ListingFiltersBar filters={filters} onChange={setFilters} />
-        <p className="text-sm text-slate-500">
-          {loading ? "Cargando anuncios…" : `${visible.length} anuncio(s)`}
-        </p>
+        {error ? null : (
+          <p className="text-sm text-slate-500">
+            {loading ? "Cargando anuncios…" : `${visible.length} anuncio(s)`}
+          </p>
+        )}
         <ListingGrid
           listings={visible}
           loading={loading}

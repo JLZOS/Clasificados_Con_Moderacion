@@ -1,7 +1,7 @@
 import {
   collection,
   doc,
-  getDocs,
+  getDocsFromServer,
   query,
   serverTimestamp,
   where,
@@ -19,7 +19,7 @@ async function openReportRefs(listingId: string) {
     where("listingId", "==", listingId),
     where("status", "==", "open"),
   );
-  const snap = await getDocs(q);
+  const snap = await getDocsFromServer(q);
   return snap.docs.map((d) => d.ref);
 }
 

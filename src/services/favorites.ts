@@ -2,8 +2,8 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
-  getDocs,
+  getDocFromServer,
+  getDocsFromServer,
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
@@ -17,12 +17,12 @@ function favoritesRef(uid: string) {
 }
 
 export async function listFavoriteIds(uid: string): Promise<Set<string>> {
-  const snap = await getDocs(favoritesRef(uid));
+  const snap = await getDocsFromServer(favoritesRef(uid));
   return new Set(snap.docs.map((d) => d.id));
 }
 
 export async function isFavorite(uid: string, listingId: string): Promise<boolean> {
-  return (await getDoc(doc(favoritesRef(uid), listingId))).exists();
+  return (await getDocFromServer(doc(favoritesRef(uid), listingId))).exists();
 }
 
 export async function addFavorite(uid: string, listingId: string): Promise<void> {

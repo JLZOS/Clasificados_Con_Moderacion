@@ -50,6 +50,22 @@ Las entradas marcadas "Rechazo/corrección" documentan qué propuso la IA y por 
   permiten leer el documento publicado. Se cambió por "Será visible en el anuncio publicado"
   para no prometer una privacidad que el backend no garantiza.
 
+## Corrección 6 · Lecturas desde caché sin conexión
+
+- **Detectado**: al revisar la interfaz en el navegador sin emuladores, el inicio decía
+  "No encontramos anuncios". `getDocs` devuelve la caché vacía en lugar de fallar.
+- **Decisión**: los servicios usan `getDocsFromServer` y `getDocFromServer`, y la interfaz muestra
+  "Sin conexión con Firebase (¿están corriendo los emuladores?)". En un marketplace moderado
+  no conviene mostrar datos viejos (por ejemplo, un anuncio ya ocultado).
+
+## Hallazgo 7 · El hook también bloquea archivos internos de Cursor
+
+- **Evidencia**: el hook `beforeReadFile` negó a Cursor la lectura de su propio log de
+  terminal en `C:\Users\<usuario>\.cursor\projects\…\terminals\*.txt` (fuera del proyecto).
+- **Decisión**: la IA **no** relajó la regla, porque modificar su propia jaula está prohibido.
+  Si se quiere permitir, una persona debe añadir esa ruta como excepción en `guard.mjs`,
+  con su prueba, en un commit `chore:` explicado.
+
 ## Plantilla
 
 ```md

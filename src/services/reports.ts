@@ -1,7 +1,7 @@
 import {
   collection,
   doc,
-  getDocs,
+  getDocsFromServer,
   limit,
   orderBy,
   query,
@@ -49,6 +49,6 @@ export async function listOpenReports(): Promise<Report[]> {
     orderBy("createdAt", "desc"),
     limit(200),
   );
-  const snap = await getDocs(q);
+  const snap = await getDocsFromServer(q);
   return compact(snap.docs.map(toReport));
 }

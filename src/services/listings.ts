@@ -2,8 +2,8 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
-  getDocs,
+  getDocFromServer,
+  getDocsFromServer,
   limit,
   orderBy,
   query,
@@ -24,7 +24,7 @@ function listingsRef() {
 }
 
 export async function getListing(id: string): Promise<Listing | null> {
-  return toListing(await getDoc(doc(listingsRef(), id)));
+  return toListing(await getDocFromServer(doc(listingsRef(), id)));
 }
 
 export async function listByStatus(status: ListingStatus): Promise<Listing[]> {
@@ -34,13 +34,13 @@ export async function listByStatus(status: ListingStatus): Promise<Listing[]> {
     orderBy("createdAt", "desc"),
     limit(PAGE_SIZE),
   );
-  const snap = await getDocs(q);
+  const snap = await getDocsFromServer(q);
   return compact(snap.docs.map(toListing));
 }
 
 export async function listBySeller(sellerId: string): Promise<Listing[]> {
   const q = query(listingsRef(), where("sellerId", "==", sellerId), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
+  const snap = await getDocsFromServer(q);
   return compact(snap.docs.map(toListing));
 }
 
