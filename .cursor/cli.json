@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(npm run check)",
+      "Shell(npm run test)",
+      "Shell(npm run lint)",
+      "Shell(npm run typecheck)",
+      "Shell(git status)",
+      "Shell(git diff)",
+      "Shell(git log)"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*firebase-adminsdk*.json)",
+      "Write(**/.env*)",
+      "Write(.claude/**)",
+      "Write(.cursor/**)",
+      "Shell(sudo)",
+      "Shell(curl)",
+      "Shell(wget)",
+      "Shell(rm)"
+    ]
+  }
+}

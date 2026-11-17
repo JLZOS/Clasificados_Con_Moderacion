@@ -1,0 +1,43 @@
+# Dependencias
+node_modules/
+
+# Next.js / build
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Pruebas
+coverage/
+reports/
+.stryker-tmp/
+
+# Secretos: nunca se versionan
+.env
+.env.*
+!env.example
+*.pem
+*.key
+*firebase-adminsdk*.json
+service-account*.json
+
+# Firebase
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+storage-debug.log*
+ui-debug.log*
+emulator-data/
+
+# Vercel
+.vercel/
+
+# Configuración local de herramientas de IA (la compartida sí se versiona)
+.claude/settings.local.json
+.claude/audit.log
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+*.log
