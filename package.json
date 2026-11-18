@@ -20,7 +20,7 @@
     "test:watch": "vitest",
     "test:hooks": "node --test .claude/hooks/guard.test.mjs",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run test && npm run test:hooks",
-    "emulators": "firebase emulators:start --project demo-clasificados --import ./emulator-data --export-on-exit",
+    "emulators": "firebase emulators:start --project demo-clasificados",
     "seed": "tsx scripts/seed.ts",
     "prepare": "husky"
   },
