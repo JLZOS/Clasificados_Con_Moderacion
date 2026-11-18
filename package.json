@@ -5,7 +5,7 @@
   "description": "Compra y venta entre estudiantes con fotos, favoritos, reportes y panel de moderación.",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12"
   },
   "scripts": {
     "dev": "next dev",

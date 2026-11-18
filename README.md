@@ -19,7 +19,9 @@ Firebase (Auth, Firestore, Storage) con Emulator Suite · Zod · Vitest · ESLin
 
 ## Requisitos
 
-- Node.js 22 o superior (probado con 24).
+- Node.js 22.12 o superior (probado con 24; ver `.nvmrc`). Con nvm-windows: `nvm install 24 && nvm use 24`.
+  `.npmrc` tiene `engine-strict=true`, así que `npm` rechaza versiones viejas con un mensaje claro.
+  Node 20.18 o anterior falla con `require() of ES Module … magic-string` (lo usa Tailwind 4).
 - Java 21 o superior para el Firebase Emulator Suite.
 - Para el sandbox de Claude Code: WSL2 con `bubblewrap` y `socat` (ver `ia/CONFIGURACION.md`).
 
