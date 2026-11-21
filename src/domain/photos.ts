@@ -32,6 +32,11 @@ export function isListingPhotoPathname(pathname: string | null): pathname is str
   return pathname !== null && PHOTO_PATHNAME.test(pathname);
 }
 
+export function photoOwnerUid(pathname: string): string | null {
+  if (!isListingPhotoPathname(pathname)) return null;
+  return pathname.split("/")[1] ?? null;
+}
+
 export function photoProxyUrl(pathname: string): string {
   return `${PHOTO_PROXY_PATH}?pathname=${encodeURIComponent(pathname)}`;
 }

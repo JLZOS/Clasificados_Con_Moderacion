@@ -3,6 +3,7 @@ import {
   canDeletePhotos,
   isListingPhotoPathname,
   listingPhotoPrefix,
+  photoOwnerUid,
   photoPathname,
   photoProxyUrl,
   safeFileName,
@@ -40,6 +41,17 @@ describe("isListingPhotoPathname", () => {
     expect(isListingPhotoPathname("listings/../abc/0-a.jpg")).toBe(false);
     expect(isListingPhotoPathname("https://evil.example/listings/a/b/0-a.jpg")).toBe(false);
     expect(isListingPhotoPathname(null)).toBe(false);
+  });
+});
+
+describe("photoOwnerUid", () => {
+  it("extrae el uid dueño de una ruta válida", () => {
+    expect(photoOwnerUid("listings/ana/abc/0-a.jpg")).toBe("ana");
+  });
+
+  it("devuelve null si la ruta no es de una foto de anuncio", () => {
+    expect(photoOwnerUid("listings/ana/abc")).toBeNull();
+    expect(photoOwnerUid("../ana/abc/0-a.jpg")).toBeNull();
   });
 });
 

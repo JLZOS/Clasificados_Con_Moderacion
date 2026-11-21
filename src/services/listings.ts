@@ -12,9 +12,10 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import { upload } from "@vercel/blob/client";
 import { z } from "zod";
 import type { Listing, ListingInput, ListingStatus } from "@/domain/listing";
-import { PHOTO_PROXY_PATH } from "@/domain/photos";
+import { PHOTO_PROXY_PATH, photoPathname, photoProxyUrl } from "@/domain/photos";
 import { firebase } from "@/lib/firebase";
 import { compact, toListing } from "./converters";
 
@@ -45,10 +46,9 @@ export async function listBySeller(sellerId: string): Promise<Listing[]> {
   return compact(snap.docs.map(toListing));
 }
 
-const uploadResponseSchema = z.object({ url: z.string().min(1) });
 const errorResponseSchema = z.object({ error: z.string().min(1) });
 
-async function authHeaders(): Promise<HeadersInit> {
+async function authHeaders(): Promise<Record<string, string>> {
   const user = firebase().auth.currentUser;
   if (!user) throw new Error("Debe iniciar sesión");
   return { Authorization: `Bearer ${await user.getIdToken()}` };
@@ -60,15 +60,26 @@ async function ensureOk(response: Response): Promise<Response> {
   throw new Error(body.success ? body.data.error : "No fue posible completar la operación");
 }
 
-async function uploadPhotos(listingId: string, photos: readonly File[]) {
+async function uploadPhoto(pathname: string, photo: File, headers: Record<string, string>) {
+  try {
+    const blob = await upload(pathname, photo, {
+      access: "private",
+      handleUploadUrl: "/api/upload",
+      contentType: photo.type,
+      headers,
+    });
+    return photoProxyUrl(blob.pathname);
+  } catch {
+    throw new Error(`No fue posible subir "${photo.name}". Verifique su sesión e intente de nuevo`);
+  }
+}
+
+async function uploadPhotos(uid: string, listingId: string, photos: readonly File[]) {
   const headers = await authHeaders();
-  const uploads = photos.map(async (photo, i) => {
-    const body = new FormData();
-    body.append("file", photo);
-    body.append("listingId", listingId);
-    body.append("index", String(i));
-    const response = await ensureOk(await fetch("/api/upload", { method: "POST", headers, body }));
-    return uploadResponseSchema.parse(await response.json()).url;
+  const uploads = photos.map((photo, i) => {
+    const pathname = photoPathname(uid, listingId, i, photo.name);
+    if (pathname === null) throw new Error("No fue posible preparar la subida de fotos");
+    return uploadPhoto(pathname, photo, headers);
   });
   return Promise.all(uploads);
 }
@@ -84,7 +95,7 @@ export async function createListing(
   seller: Seller,
 ): Promise<string> {
   const listingRef = doc(listingsRef());
-  const photoUrls = await uploadPhotos(listingRef.id, photos);
+  const photoUrls = await uploadPhotos(seller.uid, listingRef.id, photos);
   await setDoc(listingRef, {
     ...input,
     photoUrls,

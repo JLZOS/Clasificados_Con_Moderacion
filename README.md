@@ -94,9 +94,10 @@ pending ──aprobar──▶ approved ──3 reportes──▶ hidden ──r
 `pending`. Solo un moderador (custom claim) cambia el estado. Un reporte incrementa
 `reportCount` en exactamente 1 y debe crear su documento en la misma transacción
 (`existsAfter`/`getAfter`). Con 3 reportes el estado tiene que pasar a `hidden`.
-Las fotos viven en un Blob Store **privado** de Vercel. `POST /api/upload` verifica el ID token
-de Firebase y acepta solo JPG, PNG o WebP de hasta 5 MB. Además, escribe únicamente en
-`listings/{uid del token}/{listingId}/`. `GET /api/blob?pathname=…` sirve solo rutas con ese
+Las fotos viven en un Blob Store **privado** de Vercel y se suben con _client upload_: el
+navegador envía el archivo directo a Vercel Blob, nunca a la función. `POST /api/upload` solo
+firma el token (`handleUpload`). Antes verifica el ID token de Firebase y exige que la ruta sea
+`listings/{uid del token}/{listingId}/`. El token admite solo JPG, PNG o WebP de hasta 5 MB. `GET /api/blob?pathname=…` sirve solo rutas con ese
 formato (nunca URLs arbitrarias). `DELETE /api/blob` lo permite solo al dueño o a un moderador.
 En Firestore, `photoUrls` guarda la ruta del proxy (`/api/blob?pathname=…`).
 

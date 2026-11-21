@@ -11,7 +11,8 @@ const config = {
 };
 
 export const usingEmulators =
-  process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS !== "false" || projectId.startsWith("demo-");
+  process.env.NODE_ENV !== "production" &&
+  (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === "true" || projectId.startsWith("demo-"));
 
 export const allowedEmailDomain = process.env.NEXT_PUBLIC_ALLOWED_EMAIL_DOMAIN ?? "";
 
