@@ -12,8 +12,9 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { deleteObject, getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
+import { z } from "zod";
 import type { Listing, ListingInput, ListingStatus } from "@/domain/listing";
+import { PHOTO_PROXY_PATH } from "@/domain/photos";
 import { firebase } from "@/lib/firebase";
 import { compact, toListing } from "./converters";
 
@@ -44,16 +45,30 @@ export async function listBySeller(sellerId: string): Promise<Listing[]> {
   return compact(snap.docs.map(toListing));
 }
 
-function safeFileName(name: string): string {
-  return name.replace(/[^\w.-]+/g, "_").slice(-60);
+const uploadResponseSchema = z.object({ url: z.string().min(1) });
+const errorResponseSchema = z.object({ error: z.string().min(1) });
+
+async function authHeaders(): Promise<HeadersInit> {
+  const user = firebase().auth.currentUser;
+  if (!user) throw new Error("Debe iniciar sesión");
+  return { Authorization: `Bearer ${await user.getIdToken()}` };
 }
 
-async function uploadPhotos(uid: string, listingId: string, photos: readonly File[]) {
-  const { storage } = firebase();
+async function ensureOk(response: Response): Promise<Response> {
+  if (response.ok) return response;
+  const body = errorResponseSchema.safeParse(await response.json().catch(() => null));
+  throw new Error(body.success ? body.data.error : "No fue posible completar la operación");
+}
+
+async function uploadPhotos(listingId: string, photos: readonly File[]) {
+  const headers = await authHeaders();
   const uploads = photos.map(async (photo, i) => {
-    const photoRef = ref(storage, `listings/${uid}/${listingId}/${i}-${safeFileName(photo.name)}`);
-    await uploadBytes(photoRef, photo, { contentType: photo.type });
-    return getDownloadURL(photoRef);
+    const body = new FormData();
+    body.append("file", photo);
+    body.append("listingId", listingId);
+    body.append("index", String(i));
+    const response = await ensureOk(await fetch("/api/upload", { method: "POST", headers, body }));
+    return uploadResponseSchema.parse(await response.json()).url;
   });
   return Promise.all(uploads);
 }
@@ -69,7 +84,7 @@ export async function createListing(
   seller: Seller,
 ): Promise<string> {
   const listingRef = doc(listingsRef());
-  const photoUrls = await uploadPhotos(seller.uid, listingRef.id, photos);
+  const photoUrls = await uploadPhotos(listingRef.id, photos);
   await setDoc(listingRef, {
     ...input,
     photoUrls,
@@ -89,8 +104,8 @@ export async function markSold(listingId: string): Promise<void> {
 }
 
 export async function deleteListing(listing: Pick<Listing, "id" | "sellerId">): Promise<void> {
-  const folder = ref(firebase().storage, `listings/${listing.sellerId}/${listing.id}`);
-  const files = await listAll(folder);
-  await Promise.all(files.items.map((item) => deleteObject(item)));
+  const params = new URLSearchParams({ sellerId: listing.sellerId, listingId: listing.id });
+  const headers = await authHeaders();
+  await ensureOk(await fetch(`${PHOTO_PROXY_PATH}?${params}`, { method: "DELETE", headers }));
   await deleteDoc(doc(listingsRef(), listing.id));
 }

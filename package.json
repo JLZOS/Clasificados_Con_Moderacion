@@ -25,7 +25,10 @@
     "prepare": "husky"
   },
   "overrides": {
-    "@grpc/grpc-js": "^1.14.7"
+    "@grpc/grpc-js": "^1.14.7",
+    "@vercel/cli-config": {
+      "zod": "$zod"
+    }
   },
   "lint-staged": {
     "*.{ts,tsx,js,mjs}": [
@@ -37,7 +40,9 @@
     ]
   },
   "dependencies": {
+    "@vercel/blob": "^2.9.0",
     "firebase": "^13.4.0",
+    "firebase-admin": "^14.5.1",
     "next": "^16.4.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -53,7 +58,6 @@
     "@vitest/coverage-v8": "^5.1.0",
     "eslint": "^10.15.0",
     "eslint-config-next": "^16.4.6",
-    "firebase-admin": "^14.5.1",
     "firebase-tools": "^15.36.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.1",
